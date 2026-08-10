@@ -97,17 +97,12 @@ UserSchema.pre<IUser>("save", async function () {
         return await bcrypt.compare(password, this.password);
     }
     UserSchema.methods.generateAccessToken = function (): string {
-      const payload = { _id: this._id, username: this.username, email: this.email } as Record<string, any>;
-      const secret = process.env.ACCESS_TOKEN_SECRET as jwt.Secret;
-      const options: jwt.SignOptions = { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN };
-      return jwt.sign(payload, secret, options);
+      return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '15m' });
+     
     };
     UserSchema.methods.generateRefreshToken = function (): string {
-      const payload = { _id: this._id, username: this.username, email: this.email } as Record<string, any>;
-      const secret = process.env.REFRESH_TOKEN_SECRET as jwt.Secret;
-      const options: jwt.SignOptions = { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN };
-      return jwt.sign(payload, secret, options);
+      return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: '7d' });
     };
-
+ 
 const User = models.User || model<IUser>("User", UserSchema);
 export default User;
