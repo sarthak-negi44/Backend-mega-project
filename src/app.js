@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 5000;
 
 //routes
 import userRoutes from "../routes/user.routes.js";
-app.use("/api/v1/user", userRoutes);           //HTTP//LOCLAHOST:5000/api/v1/user/register
+app.use("/api/v1/users", userRoutes);           //HTTP//LOCLAHOST:5000/api/v1/users/register
 
 
 export {app};
