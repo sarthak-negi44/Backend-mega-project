@@ -1,4 +1,4 @@
-import {Schema, Types, model, models, Document} from "mongoose";
+import mongoose,{Schema, Types, model, Document} from "mongoose";
 import mongooseAutoPopulate from "mongoose-aggregate-paginate-v2";
 export interface Ivideo extends Document{
      videoFile : String;
@@ -60,5 +60,5 @@ export interface Ivideo extends Document{
 }
 )
 videoSchema.plugin(mongooseAutoPopulate);
-let video = models.video || model<Ivideo>("video", videoSchema);
+let video = mongoose.models.video || model<Ivideo>("video", videoSchema);
 export default video ;

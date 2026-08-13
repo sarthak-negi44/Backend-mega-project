@@ -1,4 +1,4 @@
-import mongoose, {Schema, model, Document, models} from "mongoose";
+import mongoose, {Schema, model, Document} from "mongoose";
 import {Types} from "mongoose";
 import  * as jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -104,5 +104,5 @@ UserSchema.pre<IUser>("save", async function () {
       return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: '7d' });
     };
  
-const User = models.User || model<IUser>("User", UserSchema);
+const User = mongoose.models.User || model<IUser>("User", UserSchema);
 export default User;

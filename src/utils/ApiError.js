@@ -14,3 +14,4 @@ class ApiError extends Error {
         this.streak = sterak
     }
 }
+export {ApiError};
