@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-(async function() {
+
 
     // Configuration
     cloudinary.config({ 
@@ -8,11 +8,12 @@ import { v2 as cloudinary } from 'cloudinary';
         api_key: process.env.CLOUDINARY_API_KEY, // Click 'View API Keys' above to copy your API key
         api_secret: process.env.CLOUDINARY_API_SECRET // Click 'View API Keys' above to copy your API secret
     });
+    const uploadCloudingary = async (localPath) => {
     
     // Upload an image
      const uploadResult = await cloudinary.uploader
        .upload(
-           'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', {
+           localPath, {
                public_id: 'shoes',
            }
        )
@@ -39,4 +40,6 @@ import { v2 as cloudinary } from 'cloudinary';
     });
     
     console.log(autoCropUrl);    
-})();
+};                          //THERE CAN BE AN ERROR FOR REMOVING THE() BEFORE; 
+
+export {uploadCloudingary};
