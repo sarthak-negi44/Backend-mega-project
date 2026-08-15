@@ -2,6 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import User from "../models/user.model.ts"
 import {uploadCloudingary} from "../utils/cloudinary.js"
+import {ApiResponse} from "../utils/ApiResponse.js"
 const registerUser = asyncHandler(async (req, res) =>{
     // get user data form frontend
     // validation - not empty, email format, password length
@@ -43,10 +44,14 @@ if(!avatar){
                 avatar: user.avatar.url,
                 coverImage: user.coverImage?.url  || null,
             }
+            
         });
-    }).catch((error) => {
+    })
+    const createdUser = await User.findById(user._id).select("-password -refreshTokens")  // THIS WILL NOT NOT SAVE PASSWORD AND REFRESHTOKENS IN THE RESPONSE
+    if(!createdUser) {
         throw new ApiError(500, "User creation failed")
-    });
+    }
+    return res.status(201).json(new ApiResponse(201, createdUser, "User created successfully"))
 }
 )
 
