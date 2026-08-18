@@ -18,21 +18,20 @@ console.log("email", email);
 if(!fullName || !email || !username || !password){
     throw new ApiError(400, "All fields are required")
 }
-User.findOne({$or: [{email}, {username}]}).then((error) => {
-    if(error){
-        throw new ApiError(400, "User already exists")
-    }
-})
+const existingUser = await User.findOne({$or: [{email}, {username}]})
+if(!existingUser){
+    throw new ApiError(400, "User detail already exists")
+}
 const avatarLocalPath = req.files.avatar[0]?.path
 const converImage = req.files.coverImage[0]?.path
 if(!avatarLocalPath)
 {
-    throw new ApiError(400, "Avatar is valid")
+    throw new ApiError(400, "Avatar is required")
 }
 const avatar = await uploadCloudingary(avatarLocalPath)
 const coverImage = await uploadCloudingary(converImage)
-if(!avatar){
-        throw new ApiError(400, "User already exists")
+if(!avatar ){
+        throw new ApiError(400, "Avatar upload failed")
     }
     user.create({fullName, email, username, password, avatar, coverImage}).then((user) => {   // create user in db
         res.status(201).json({
