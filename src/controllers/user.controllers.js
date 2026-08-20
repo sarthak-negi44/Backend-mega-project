@@ -1,7 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import User from "../models/user.model.ts"
-import {uploadCloudingary} from "../utils/cloudinary.js"
+import {uploadCloudinary} from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 const registerUser = asyncHandler(async (req, res) =>{
     // get user data form frontend
@@ -14,39 +14,37 @@ const registerUser = asyncHandler(async (req, res) =>{
     // check for the user creation
     // return response to frontend with user object and success message
 const {fullName, email, username, password} = req.body
-console.log("email", email);
+// console.log("email:", email);
 if(!fullName || !email || !username || !password){
     throw new ApiError(400, "All fields are required")
 }
-const existingUser = await User.findOne({$or: [{email}, {username}]})
-if(!existingUser){
-    throw new ApiError(400, "User detail already exists")
+const existingUser = await User.findOne({$or: [{email: email.toLowerCase()}]})
+if(existingUser){
+    throw new ApiError(409, "User detail already exists")
 }
-const avatarLocalPath = req.files.avatar[0]?.path
-const converImage = req.files.coverImage[0]?.path
+let avatarLocalPath = req.files.avatar[0]?.path
+let converImage;
+if(req.files.coverImage && req.files.coverImage.length > 0){
+    converImage = req.files.coverImage[0]?.path
+}
 if(!avatarLocalPath)
 {
     throw new ApiError(400, "Avatar is required")
 }
-const avatar = await uploadCloudingary(avatarLocalPath)
-const coverImage = await uploadCloudingary(converImage)
+const avatar = await uploadCloudinary(avatarLocalPath)
+const coverImage = await uploadCloudinary(converImage)
 if(!avatar ){
         throw new ApiError(400, "Avatar upload failed")
     }
-    user.create({fullName, email, username, password, avatar, coverImage}).then((user) => {   // create user in db
-        res.status(201).json({
-            message: "User created successfully",
-            user: {
-                fullName: user.fullName,
-                email: user.email,
-                username: user.username.toLowerCase(),     // THERE CAN BE AN ERROR  FOR USER AVATAR AND COVERIMAGE THE CODE USED TO UPLAOD THE IMAGE 
-                avatar: user.avatar.url,
-                coverImage: user.coverImage?.url  || null,
-            }
-            
-        });
-    })
-    const createdUser = await User.findById(user._id).select("-password -refreshTokens")  // THIS WILL NOT NOT SAVE PASSWORD AND REFRESHTOKENS IN THE RESPONSE
+   const user = await User.create({
+    fullName,
+    email: email.toLowerCase(),
+    username: username.toLowerCase(),
+    password,
+    avatar: avatar.url,
+    coverImage: coverImage?.url || null
+   })
+   const createdUser = await User.findById(user._id).select("-password -refreshTokens")  // THIS WILL NOT NOT SAVE PASSWORD AND REFRESHTOKENS IN THE RESPONSE
     if(!createdUser) {
         throw new ApiError(500, "User creation failed")
     }

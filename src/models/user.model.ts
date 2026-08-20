@@ -46,14 +46,11 @@ const UserSchema = new Schema<IUser>(
   },
   avatar:{
     type: String,            //Cloudinary
-    required: true,
-    unique: true,
     trim: true,
 
   },
   refreshToken:{
     type: String,
-    required: true,
     unique: true,
     lowercase: true,
     trim: true,
@@ -69,7 +66,6 @@ const UserSchema = new Schema<IUser>(
   },
   converter:{
     type: String,
-    required: true,
     unique: true,
     trim: true,
   },
@@ -80,7 +76,7 @@ const UserSchema = new Schema<IUser>(
   watchHistory:{
   type: Schema.Types.ObjectId,
   ref: "video",
-  required:true,
+
 
   },
 },
