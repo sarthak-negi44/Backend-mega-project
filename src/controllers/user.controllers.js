@@ -51,5 +51,8 @@ if(!avatar ){
     return res.status(201).json(new ApiResponse(201, createdUser, "User created successfully"))
 }
 )
-
-export {registerUser}
+const loginUser = asyncHandler(async (req, res) => {
+    const {email, password} = req.body
+    
+})
+export {registerUser, loginUser}
