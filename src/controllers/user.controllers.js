@@ -3,6 +3,7 @@ import {ApiError} from "../utils/ApiError.js"
 import User from "../models/user.model.ts"
 import {uploadCloudinary} from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
+import jwt from "jsonwebtoken"
 const generateAccessandRefreshTokens = async(userId)=>
     {
     try{
@@ -14,6 +15,7 @@ const generateAccessandRefreshTokens = async(userId)=>
    return {accessToken, refreshToken}
     }
     catch (error){
+        console.error("Error while generating access and refresh tokens:", error)
         throw new ApiError(400, "someting went wrong while generating access and refresh token")
    
     }
@@ -74,20 +76,22 @@ const loginUser = asyncHandler(async (req, res) => {
    // access and refresh token
    // send cookies 
     const {email, password, username}  = req.body
-    if(!email || !username){
+    if(!(email || username)){
         throw new ApiError(400, "Enter email or username")
     }
  const user  = await User.findOne({$or: [{email: email ?.toLowerCase()}, {username: username ?.toLowerCase()}]})
  if(!user){
     throw new ApiError(404, "User not found")
  }
- const isPasswordValid = await user.isPasswordValid(password)
+ console.log(email, username, password);
+
+ const isPasswordValid = await user.comparePassword(password)
  if(!isPasswordValid){
     throw new ApiError(404, "Password is not correct")
 
  }
 
- const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
+ const {accessToken, refreshToken} = await generateAccessandRefreshTokens(user._id)
 
 const loggedInUser = await User.findById(user._id).select("-password -refreshTokens")
 if(!loggedInUser){
@@ -115,4 +119,4 @@ const logoutUser = asyncHandler(async (req, res) => {
         .clearCookie("accessToken", options)
         .json(new ApiResponse(200, null, "User logged out successfully"))
 })
-export {registerUser, loginUser, logoutUser, generateAccessandRefreshTokens}
+export {registerUser, loginUser, logoutUser}

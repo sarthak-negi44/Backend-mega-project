@@ -1,6 +1,6 @@
 import mongoose, {Schema, model, Document} from "mongoose";
 import {Types} from "mongoose";
-import  * as jwt from "jsonwebtoken";
+import  jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 export interface IUser extends Document {
 
@@ -56,13 +56,8 @@ const UserSchema = new Schema<IUser>(
     trim: true,
   },
   password:{
-    type: String || Number,
+    type: String,
     required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    index: true,
-
   },
   converter:{
     type: String,
@@ -85,10 +80,12 @@ const UserSchema = new Schema<IUser>(
   }
 )
 UserSchema.pre<IUser>("save", async function () {
-  if (!this.isModified("password")) return ;
-  this.password = await bcrypt.hash(this.password, 10)
-  
-})
+    if (!this.isModified("password")) {
+        return ;
+    }
+    this.password = await bcrypt.hash(this.password, 10);
+    
+});
     UserSchema.methods.comparePassword = async function (password: string): Promise<boolean> {
         return await bcrypt.compare(password, this.password);
     }
